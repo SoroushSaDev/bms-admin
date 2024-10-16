@@ -62,6 +62,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/{register:id}/edit', [RegisterController::class, 'edit'])->name('edit');
             Route::patch('/{register:id}', [RegisterController::class, 'update'])->name('update');
             Route::delete('/{register:id}', [RegisterController::class, 'destroy'])->name('destroy');
+            Route::post('/{register:id}/send', [RegisterController::class, 'send'])->name('send');
         });
         Route::prefix('/devices')->name('devices.')->group(function () {
             Route::get('/', [DeviceController::class, 'index'])->name('index');

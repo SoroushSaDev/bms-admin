@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\MqttMessageReceived;
 use App\Http\Requests\RegisterRequest;
 use App\Models\Device;
 use App\Models\Register;
-use App\Services\MqttService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpMqtt\Client\Facades\MQTT;
 
 class RegisterController extends Controller
 {
@@ -83,8 +82,23 @@ class RegisterController extends Controller
         DB::beginTransaction();
         try {
             $device = $register->Device;
-            DB::commit();
             $register->delete();
+            DB::commit();
+            return redirect(route('devices.registers', $device));
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            dd($exception);
+        }
+    }
+
+    public function send(Register $register)
+    {
+        DB::beginTransaction();
+        try {
+            $device = $register->Device;
+            $mqtt = MQTT::connection();
+            $mqtt->publish($device->mqtt_topic, 'test');
+            DB::commit();
             return redirect(route('devices.registers', $device));
         } catch (\Exception $exception) {
             DB::rollBack();
