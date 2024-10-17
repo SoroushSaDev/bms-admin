@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Events\ChatEvent;
 use Illuminate\Console\Command;
 use PhpMqtt\Client\Facades\MQTT;
+use App\Jobs\HandleIncomingMessageJob;
 
 class SubscribeToTopic extends Command
 {
@@ -34,6 +35,7 @@ class SubscribeToTopic extends Command
             $mqtt->subscribe($inputTopic, function (string $topic, string $message) {
                 $this->info(sprintf("Received message on topic [%s]: %s", $topic, $message));
                 event(new ChatEvent($topic, $message));
+                HandleIncomingMessageJob::dispatch($message, $topic)->onConnection('database');
             });
             $mqtt->loop(true);
         } catch (\Exception $exception) {

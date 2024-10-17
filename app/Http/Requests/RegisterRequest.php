@@ -27,25 +27,14 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'device_id' => request()->is('api/*') ? 'required|exists:devices,id' : 'nullable',
             'title' => 'string|required',
             'unit' => 'string|nullable',
             'type' => ['nullable', Rule::in(Register::Types)],
-            'input' => 'nullable|in:digital,analog',
-            'output' => 'nullable|in:digital,analog',
         ];
     }
 
     public function failedValidation(Validator $validator)
     {
-        if (request()->is('api/*')) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation errors',
-                'data' => $validator->errors(),
-            ], 422);
-        } else {
-            dd($validator->errors());
-        }
+        dd($validator->errors());
     }
 }

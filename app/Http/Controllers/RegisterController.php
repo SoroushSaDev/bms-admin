@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
+use App\Models\Command;
 use App\Models\Device;
 use App\Models\Register;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpMqtt\Client\Facades\MQTT;
+
+use function React\Promise\all;
 
 class RegisterController extends Controller
 {
@@ -24,7 +27,8 @@ class RegisterController extends Controller
 
     public function create(Device $device)
     {
-        return view('registers.create', compact('device'));
+        $types = Command::Types;
+        return view('registers.create', compact('device', 'types'));
     }
 
     public function store(Device $device, RegisterRequest $request)
@@ -37,6 +41,23 @@ class RegisterController extends Controller
             $register->unit = $request->has('unit') ? $request['unit'] : null;
             $register->type = $request->has('type') ? $request['type'] : null;
             $register->save();
+            if($request->has('command')) {
+                foreach($request['command'] as $i => $command) {
+                    $type = $request['command_type'][$i];
+                    $value = match($type) {
+                        'SetPoint' => json_encode([$request['from'][$i], $request['to'][$i]]),
+                        'Switch' => json_encode(explode(',', $request['switches'][$i])),
+                        default => null,
+                    };
+                    Command::create([
+                        'register_id' => $register->id,
+                        'title' => $request['command_title'][$i],
+                        'type' => $type,
+                        'command' => $command,
+                        'value' => $value,
+                    ]);
+                }
+            }
             DB::commit();
             $register->Translate();
             return redirect(route('devices.registers', $device));
@@ -55,8 +76,9 @@ class RegisterController extends Controller
 
     public function edit(Register $register)
     {
+        $types = Command::Types;
         $device = $register->Device;
-        return view('registers.edit', compact('register', 'device'));
+        return view('registers.edit', compact('register', 'device', 'types'));
     }
 
     public function update(Register $register, RegisterRequest $request)
@@ -95,9 +117,10 @@ class RegisterController extends Controller
     {
         DB::beginTransaction();
         try {
+            $message = 'register ' . $register->key;
             $device = $register->Device;
             $mqtt = MQTT::connection();
-            $mqtt->publish($device->mqtt_topic, 'test');
+            $mqtt->publish($device->mqtt_topic, $message);
             DB::commit();
             return redirect(route('devices.registers', $device));
         } catch (\Exception $exception) {
