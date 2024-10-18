@@ -12,9 +12,3 @@ window.Echo = new Echo({
     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
 });
-   
-// window.Echo.channel('chat-channel').listen('ChatEvent', (e) => {
-//     console.log(e);
-//     const obj = JSON.parse(e.message);
-//     console.log(obj);
-// });

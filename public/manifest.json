@@ -1,0 +1,10 @@
+{
+    "name": "BMS Admin Panel",
+    "short_name": "BMS",
+    "description": "Behin Start BMS Admin Panel",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4A90E2"
+  }
+  
