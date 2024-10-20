@@ -39,8 +39,8 @@
     const topic = '{{ $device->mqtt_topic }}';
     document.addEventListener("DOMContentLoaded", function() {
         window.Echo.channel('chat-channel').listen('ChatEvent', (event) => {
+            console.log(event);
             if(topic == event.topic) {
-                console.log(event);
                 try {
                     const values = JSON.parse(event.message);
                     console.log(values);
