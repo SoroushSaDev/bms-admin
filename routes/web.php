@@ -14,8 +14,7 @@ use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $route = auth()->check() ? route('dashboard') : route('login');
-    return redirect($route);
+    return redirect(route('dashboard'));
 });
 Route::get('/login', [HomeController::class, 'login'])->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
