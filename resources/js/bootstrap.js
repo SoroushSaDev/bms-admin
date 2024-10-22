@@ -10,3 +10,6 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
  */
 
 import './echo';
+
+import Swal from 'sweetalert2';
+window.swal = Swal;
