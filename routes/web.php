@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect(route('dashboard'));
 });
+Route::get('/manifest.json', function() {
+    return response()->view('manifest')->header('Contebt-Type', 'application/json');
+});
 Route::get('/login', [HomeController::class, 'login'])->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
 Route::middleware('auth')->group(function () {
