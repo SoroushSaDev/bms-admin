@@ -46,6 +46,11 @@ class Register extends Model
         return $this->hasMany(Register::class, 'parent_id', 'id');
     }
 
+    public function Commands(): HasMany
+    {
+        return $this->hasMany(Command::class, 'register_id', 'id');
+    }
+
     public function Translate(): void
     {
         TranslateAll($this, ['unit', 'input', 'output']);
