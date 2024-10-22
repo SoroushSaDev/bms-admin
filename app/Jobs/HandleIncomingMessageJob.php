@@ -33,19 +33,18 @@ class HandleIncomingMessageJob implements ShouldQueue
         try {
             $topic = $this->topic;
             $message = $this->message;
-            if (json_validate($message)) {
+            $message = str_replace('[', '', $message);
+            $message = str_replace(']', '', $message);
+            $registers = explode(',', $message);
+            if (count($registers)) {
                 $devices = Device::where('mqtt_topic', $topic)->get();
-                if (count($devices)) {
-                    $registers = json_decode($message, true);
-                    if (count($registers)) {
-                        foreach ($devices as $device) {
-                            foreach ($registers as $key => $value) {
-                                $register = Register::where('device_id', $device->id)->where('key', $key)->first();
-                                if (!is_null($register)) {
-                                    $register->value = $value;
-                                    $register->save();
-                                }
-                            }
+                foreach ($devices as $device) {
+                    foreach ($registers as $value) {
+                        $data = array_values(explode(':', $value));
+                        $register = Register::where('device_id', $device->id)->where('key', $data[0])->first();
+                        if (!is_null($register)) {
+                            $register->value = $data[1];
+                            $register->save();
                         }
                     }
                 }
