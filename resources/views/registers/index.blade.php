@@ -40,13 +40,12 @@
     document.addEventListener("DOMContentLoaded", function() {
         window.Echo.channel('chat-channel').listen('ChatEvent', (event) => {
             console.log(event);
-            if(topic == event.topic) {
+            if(topic == event.topic) {            
                 try {
-                    const values = JSON.parse(event.message);
-                    console.log(values);
-                    Object.entries(values).forEach(([key, value]) => {
-                        console.log(`${key}: ${value}`);
-                        $('#register' + key).html(value);
+                    const registers = event.message.replaceAll('[', '').replaceAll(']', '').split(',');
+                    registers.map(function(register, index) {
+                        register = Object.values(register.split(':'));
+                        $('#register' + register[0]).html(register[1]);
                     });
                 } catch (e) {
                     console.log(e);
