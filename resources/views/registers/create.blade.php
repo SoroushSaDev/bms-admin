@@ -48,7 +48,7 @@
             Commands :
         </h3>
         <ol id="commands" class="space-y-2">
-            <li class="bg-gray-600 p-2 rounded">
+            <li class="bg-gray-400 dark:bg-gray-600 p-2 rounded">
                 <div class="grid gap-6 md:grid-cols-5">
                     <div>
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
