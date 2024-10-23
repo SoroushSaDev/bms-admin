@@ -37,7 +37,9 @@
     <div id="modal-target"></div>
 @endsection
 <script>
+    let modal = undefined;
     const topic = '{{ $device->mqtt_topic }}';
+
     document.addEventListener("DOMContentLoaded", function() {
         window.Echo.channel('chat-channel').listen('ChatEvent', (event) => {
             console.log(event);
@@ -58,9 +60,8 @@
         });
     });
 
-    let modal = undefined;
     function Commands(btn) {
-        document.body.style.cursor='wait';
+        SetLoading(true);
         const url = $(btn).data('url');
         $.ajax({
             url: url,
@@ -70,10 +71,16 @@
             const $targetEl = document.getElementById('commands-modal');
             modal = new Modal($targetEl);
             modal.show();
-            document.body.style.cursor='default';
         }).fail(function(jqXHR, textStatus) {
-            document.body.style.cursor='default';
-            alert("Request failed: " + textStatus);
+            window.swal.fire({
+                title: 'Error!',
+                text: 'Please contact support',
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            });
+            console.log(textStatus);
+        }).always(function() {
+            SetLoading(false);
         });
     }
 </script>
