@@ -49,68 +49,69 @@
             Commands :
         </h3>
         <ol id="commands" class="space-y-2">
-            @foreach($register->Commands as $command)
-            <li class="bg-gray-600 p-2 rounded">
-                <div class="grid gap-6 md:grid-cols-5">
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Title
-                        </label>
-                        <input type="text" name="command_title[]" required
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            value="{{ $command->title }}"/>
+            @foreach($register->Commands as $index => $command)
+                <li class="bg-gray-600 p-2 rounded">
+                    <input hidden name="id[{{ $index }}]" value="{{ $command->id }}">
+                    <div class="grid gap-6 md:grid-cols-5">
+                        <div>
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Title
+                            </label>
+                            <input type="text" name="command_title[{{ $index }}]" required
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value="{{ $command->title }}"/>
+                        </div>
+                        <div>
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Command
+                            </label>
+                            <input type="text" name="command[{{ $index }}]" required
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value="{{ $command->command }}"/>
+                        </div>
+                        <div>
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Type
+                            </label>
+                            <select name="command_type[{{ $index }}]" onchange="SetType(this)"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    @foreach($types as $key => $type)
+                                        <option value="{{ $key }}" @selected($command->type == $key)>
+                                            {{ $type }}
+                                        </option>
+                                    @endforeach
+                            </select>
+                        </div>
+                        <div class="switchable {{ $command->type != 'Switch' ? 'hidden' : '' }}">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Switches
+                            </label>
+                            <input type="text" name="switches[{{ $index }}]" placeholder="separate with commas ( , )"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value="{{ $command->type == 'Switch' ? implode(',', json_decode($command->value)) : '' }}"/>
+                        </div>
+                        <div class="limit {{ $command->type != 'SetPoint' ? 'hidden' : '' }}">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Limit From
+                            </label>
+                            <input type="number" name="from[{{ $index }}]"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value="{{ $command->type == 'SetPoint' ? json_decode($command->value)[0] : '' }}"/>
+                        </div>
+                        <div class="limit {{ $command->type != 'SetPoint' ? 'hidden' : '' }}">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Limit To
+                            </label>
+                            <input type="number" name="to[{{ $index }}]"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value="{{ $command->type == 'SetPoint' ? json_decode($command->value)[1] : '' }}"/>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Command
-                        </label>
-                        <input type="text" name="command[]" required
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            value="{{ $command->command }}"/>
-                    </div>
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Type
-                        </label>
-                        <select name="command_type[]" onchange="SetType(this)"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                @foreach($types as $key => $type)
-                                    <option value="{{ $key }}" @selected($command->type == $key)>
-                                        {{ $type }}
-                                    </option>
-                                @endforeach
-                        </select>
-                    </div>
-                    <div class="switchable {{ $command->type != 'Switch' ? 'hidden' : '' }}">
-                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Switches
-                        </label>
-                        <input type="text" name="switches[]" placeholder="separate with commas ( , )"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            value="{{ $command->type == 'Switch' ? implode(',', json_decode($command->value)) : '' }}"/>
-                    </div>
-                    <div class="limit {{ $command->type != 'SetPoint' ? 'hidden' : '' }}">
-                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Limit From
-                        </label>
-                        <input type="number" name="from[]"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            value="{{ $command->type == 'SetPoint' ? json_decode($command->value)[0] : '' }}"/>
-                    </div>
-                    <div class="limit {{ $command->type != 'SetPoint' ? 'hidden' : '' }}">
-                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Limit To
-                        </label>
-                        <input type="number" name="to[]"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            value="{{ $command->type == 'SetPoint' ? json_decode($command->value)[1] : '' }}"/>
-                    </div>
-                </div>
-                <button type="button" onclick="$(this).parent().remove();"
-                    class="mt-2 flex items-center justify-center text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
-                    Remove Command
-                </button>
-            </li>
+                    <button type="button" onclick="$(this).parent().remove();"
+                        class="mt-2 flex items-center justify-center text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                        Remove Command
+                    </button>
+                </li>
             @endforeach
         </ol>
         <button type="button" onclick="AddCommand()"

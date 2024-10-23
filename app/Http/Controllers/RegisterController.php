@@ -52,11 +52,12 @@ class RegisterController extends Controller
                         default => null,
                     };
                     Command::create([
+                        'device_id' => $device->id,
                         'register_id' => $register->id,
                         'title' => $request['command_title'][$i],
-                        'type' => $type,
                         'command' => $command,
                         'value' => $value,
+                        'type' => $type,
                     ]);
                 }
             }
@@ -91,6 +92,43 @@ class RegisterController extends Controller
             $register->unit = $request->has('unit') ? $request['unit'] : $register->unit;
             $register->type = $request->has('type') ? $request['type'] : $register->type;
             $register->save();
+            foreach($register->Commands as $command) {
+                if(!in_array($command->id, $request['id'])) {
+                    $command->delete();
+                } else {
+                    $i = array_search($command->id, $request['id']);
+                    $type = $request['command_type'][$i];
+                    $value = match($type) {
+                        'SetPoint' => json_encode([$request['from'][$i], $request['to'][$i]]),
+                        'Switch' => json_encode(explode(',', $request['switches'][$i])),
+                        default => null,
+                    };
+                    $command->update([
+                        'title' => $request['command_title'][$i],
+                        'command' => $request['command'][$i],
+                        'value' => $value,
+                        'type' => $type,
+                    ]);
+                }
+            }
+            foreach($request['command'] as $i => $command) {
+                if(!in_array($i, array_keys($request['id']))) {
+                    $type = $request['command_type'][$i];
+                    $value = match($type) {
+                        'SetPoint' => json_encode([$request['from'][$i], $request['to'][$i]]),
+                        'Switch' => json_encode(explode(',', $request['switches'][$i])),
+                        default => null,
+                    };
+                    Command::create([
+                        'register_id' => $register->id,
+                        'device_id' => $register->Device->id,
+                        'title' => $request['command_title'][$i],
+                        'command' => $command,
+                        'value' => $value,
+                        'type' => $type,
+                    ]);
+                }
+            }
             DB::commit();
             $register->Translate();
             $device = $register->Device;
