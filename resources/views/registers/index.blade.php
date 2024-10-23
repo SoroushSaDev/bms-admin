@@ -42,21 +42,22 @@
 
     document.addEventListener("DOMContentLoaded", function() {
         window.Echo.channel('chat-channel').listen('ChatEvent', (event) => {
-            console.log(event);
-            if(topic == event.topic) {            
-                try {
-                    const registers = event.message.replaceAll('[', '').replaceAll(']', '').split(',');
-                    // const registers = event.message.replace('OUTPUT+', '').split('+');
-                    registers.map(function(register, index) {
-                        register = Object.values(register.split(':'));
-                        $('#register' + register[0]).html(register[1]);
-                        // $('#register' + index).html(register);
-                    });
-                } catch (e) {
-                    console.log(e);
-                    return false;
-                }
-            }
+            console.log(event.length);
+            // console.log(event);
+            // if(topic == event.topic) {
+            //     try {
+            //         const registers = event.message.replaceAll('[', '').replaceAll(']', '').split(',');
+            //         // const registers = event.message.replace('OUTPUT+', '').split('+');
+            //         registers.map(function(register, index) {
+            //             register = Object.values(register.split(':'));
+            //             $('#register' + register[0]).html(register[1]);
+            //             // $('#register' + index).html(register);
+            //         });
+            //     } catch (e) {
+            //         console.log(e);
+            //         return false;
+            //     }
+            // }
         });
     });
 
