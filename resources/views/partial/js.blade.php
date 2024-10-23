@@ -15,6 +15,21 @@
         });
     }
 </script>
+<script type="text/javascript">
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+</script>
+<script>
+    function SetLoading(state) {
+        const cursor = state ? 'wait' : 'default'
+        document.body.style.cursor = cursor;
+    }
+</script>
+
+<!-- Samples -->
 <script>
     // new Toast({
         //     message: 'This is a danger message. You can use this for errors etc',

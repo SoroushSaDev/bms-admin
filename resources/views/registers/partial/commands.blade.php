@@ -29,9 +29,9 @@
                                     @foreach(json_decode($command->value) as $key => $value)
                                         <li class="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
                                             <div class="flex items-center px-3">
-                                                <input id="{{ 'switch' . $key }}" type="radio" value="{{ $value }}" name="{{ 'command' . $command->id }}"
+                                                <input id="{{ 'switch' . $key }}" type="radio" value="{{ $value }}" name="{{ 'command' . $command->id }}" onchange="run(this)"
                                                     class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-                                                    @checked($command->current == $value)>
+                                                    data-type="{{ $command->type }}" data-command="{{ $command->id }}" @checked($command->current == $value)>
                                                 <label for="{{ 'switch' . $key }}" class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
                                                     {{ $value }}
                                                 </label>
@@ -46,10 +46,10 @@
                                     $max = json_decode($command->value)[1];
                                 @endphp
                                 <div class="flex">
-                                    <input type="number" name="{{ 'command' . $command->id }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    <input type="number" id="{{ 'command' . $command->id }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         placeholder="{{ 'Enter a value between ' . $min . ' & ' . $max }}"
                                         value="{{ $command->current }}" min="{{ $min }}" max="{{ $max }}"/>
-                                    <button type="button"
+                                    <button type="button" onclick="run(this)" data-type="{{ $command->type }}" data-command="{{ $command->id }}"
                                         class="ml-5 flex items-center text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-auto px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill sm:mr-2" viewBox="0 0 16 16">
                                             <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/>
@@ -65,7 +65,7 @@
                                     <p class="rounded-lg bg-gray-300 dark:bg-gray-700 p-2">
                                         {{ $command->command }}
                                     </p>
-                                    <button type="button"
+                                    <button type="button" onclick="run(this)" data-type="{{ $command->type }}" data-command="{{ $command->id }}"
                                         class="ml-5 flex items-center text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-auto px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill sm:mr-2" viewBox="0 0 16 16">
                                             <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/>
@@ -89,3 +89,45 @@
         </div>
     </div>
 </div>
+<script>
+    function run(event) {
+        SetLoading(true);
+        let value = '';
+        const type = $(event).data('type');
+        const command = $(event).data('command');
+        switch(type) {
+            case 'Switch':
+                value = $('input[name="command' + command + '"]:checked').val();
+                break;
+            case 'SetPoint':
+                value = $('#command' + command).val();
+                break;
+            default:
+                break;
+        }
+        $.ajax({
+            url: "{{ route('registers.publish', $register) }}",
+            method: "POST",
+            data: {
+                type: type,
+                value: value,
+                command: command,
+            }
+        }).done(function(data) {
+            new Toast({
+                message: 'Command ran successfully : ' + data,
+                type: 'success'
+            });
+        }).fail(function(jqXHR, textStatus) {
+            window.swal.fire({
+                title: 'Error!',
+                text: 'Please contact support',
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            });
+            console.log(textStatus);
+        }).always(function() {
+            SetLoading(false);
+        });
+    }
+</script>

@@ -6,8 +6,10 @@ use App\Http\Requests\RegisterRequest;
 use App\Models\Command;
 use App\Models\Device;
 use App\Models\Register;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use PhpMqtt\Client\Facades\MQTT;
 
 use function React\Promise\all;
@@ -116,5 +118,34 @@ class RegisterController extends Controller
     public function commands(Register $register)
     {
         return view('registers.partial.commands', compact('register'));
+    }
+
+    public function publish(Register $register, Request $request)
+    {
+        $request->validate([
+            'command' => 'required|exists:commands,id',
+            'value' => Rule::requiredIf($request['type'] != 'Text'),
+            'type' => ['required', Rule::in(array_keys(Command::Types))],
+        ]);
+        DB::beginTransaction();
+        try {
+            $type = $request['type'];
+            $value = $request['value'];
+            $command = Command::findOrFail($request['command']);
+            if($command->type != $type) abort(403);
+            $message = $command->command;
+            if($type != 'Text') {
+                $message .= '=' . $value;
+                $command->current = $value;
+                $command->save();
+            }
+            $mqtt = MQTT::connection();
+            $mqtt->publish($register->Device->mqtt_topic, $message);
+            DB::commit();
+            return $message;
+        } catch(\Exception $exception) {
+            DB::rollBack();
+            dd($exception);
+        }
     }
 }
