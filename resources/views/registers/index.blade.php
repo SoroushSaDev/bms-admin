@@ -60,6 +60,7 @@
 
     let modal = undefined;
     function Commands(btn) {
+        document.body.style.cursor='wait';
         const url = $(btn).data('url');
         $.ajax({
             url: url,
@@ -69,7 +70,9 @@
             const $targetEl = document.getElementById('commands-modal');
             modal = new Modal($targetEl);
             modal.show();
+            document.body.style.cursor='default';
         }).fail(function(jqXHR, textStatus) {
+            document.body.style.cursor='default';
             alert("Request failed: " + textStatus);
         });
     }
