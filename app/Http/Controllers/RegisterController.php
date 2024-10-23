@@ -113,19 +113,8 @@ class RegisterController extends Controller
         }
     }
 
-    public function send(Register $register)
+    public function commands(Register $register)
     {
-        DB::beginTransaction();
-        try {
-            $message = 'register ' . $register->key;
-            $device = $register->Device;
-            $mqtt = MQTT::connection();
-            $mqtt->publish($device->mqtt_topic, $message);
-            DB::commit();
-            return redirect(route('devices.registers', $device));
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            dd($exception);
-        }
+        return view('registers.partial.commands', compact('register'));
     }
 }

@@ -13,9 +13,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect(route('dashboard'));
-});
+// Route::get('/', function () {
+//     return redirect(route('dashboard'));
+// });
 Route::get('/manifest.json', function() {
     return response()->view('manifest')->header('Contebt-Type', 'application/json');
 });
@@ -64,7 +64,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/{register:id}/edit', [RegisterController::class, 'edit'])->name('edit');
             Route::patch('/{register:id}', [RegisterController::class, 'update'])->name('update');
             Route::delete('/{register:id}', [RegisterController::class, 'destroy'])->name('destroy');
-            Route::post('/{register:id}/send', [RegisterController::class, 'send'])->name('send');
+            Route::get('/{register:id}/commands', [RegisterController::class, 'commands'])->name('commands');
         });
         Route::prefix('/devices')->name('devices.')->group(function () {
             Route::get('/', [DeviceController::class, 'index'])->name('index');

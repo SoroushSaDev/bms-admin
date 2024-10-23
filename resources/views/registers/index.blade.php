@@ -34,6 +34,7 @@
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5">
         @include('registers.partial.table')
     </div>
+    <div id="modal-target"></div>
 @endsection
 <script>
     const topic = '{{ $device->mqtt_topic }}';
@@ -43,9 +44,11 @@
             if(topic == event.topic) {            
                 try {
                     const registers = event.message.replaceAll('[', '').replaceAll(']', '').split(',');
+                    // const registers = event.message.replace('OUTPUT+', '').split('+');
                     registers.map(function(register, index) {
                         register = Object.values(register.split(':'));
                         $('#register' + register[0]).html(register[1]);
+                        // $('#register' + index).html(register);
                     });
                 } catch (e) {
                     console.log(e);
@@ -53,5 +56,21 @@
                 }
             }
         });
-    })
+    });
+
+    let modal = undefined;
+    function Commands(btn) {
+        const url = $(btn).data('url');
+        $.ajax({
+            url: url,
+            method: "GET",
+        }).done(function(data) {
+            $('#modal-target').html(data);
+            const $targetEl = document.getElementById('commands-modal');
+            modal = new Modal($targetEl);
+            modal.show();
+        }).fail(function(jqXHR, textStatus) {
+            alert("Request failed: " + textStatus);
+        });
+    }
 </script>

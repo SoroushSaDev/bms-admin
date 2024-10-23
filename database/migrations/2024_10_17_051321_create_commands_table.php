@@ -15,11 +15,13 @@ return new class extends Migration
     {
         Schema::create('commands', function (Blueprint $table) {
             $table->id();
-            $table->integer('register_id');
+            $table->integer('device_id');
+            $table->integer('register_id')->nullable();
             $table->string('title');
             $table->enum('type', ['Switch', 'SetPoint', 'Text'])->default('Text');
             $table->string('command');
             $table->string('value')->nullable();
+            $table->string('current')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
