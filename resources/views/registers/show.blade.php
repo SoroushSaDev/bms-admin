@@ -36,6 +36,69 @@
             Updated At : {{ Carbon::parse($register->updated_at)->format('Y/m/d | H:m:i') }}
         </li>
     </ul>
+    <h3 class="text-2xl my-5">
+        Commands :
+    </h3>
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5">
+        <table id="data" class="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-100">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">
+                        #
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Title
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Command
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Type
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Values
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($register->Commands as $key => $command)
+                <tr class="odd:bg-dar-gray-100 odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                    <td class="px-6 py-4">
+                        {{ $key + 1 }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ $command->title }}
+                    </td>
+                    <td class="px-6 py-4" id="register{{ $register->key }}">
+                        {{ $command->command }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ $command->GetType() }}
+                    </td>
+                    <td class="px-6 py-4">
+                        @switch($command->type)
+                            @case('Switch')
+                                {{ implode(' , ', json_decode($command->value)) }}
+                                @break
+                            @case('SetPoint')
+                                {{ 'From ' . json_decode($command->value)[0] . ' To ' . json_decode($command->value)[1] }}
+                                @break
+                            @default
+                                ---
+                                @break
+                        @endswitch
+                    </td>
+                </tr>
+                @empty
+                <tr class="odd:bg-dar-gray-100 odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                    <td colspan="5" class="px-6 py-4">
+                        No Records
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
     <hr class="my-5 border-gray-300 dark:border-gray-700">
     <div class="flex">
         <a href="{{ route('registers.edit', $register) }}"

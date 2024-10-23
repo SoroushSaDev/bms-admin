@@ -22,4 +22,9 @@ class Command extends Model
     {
         return $this->belongsTo(Register::class, 'register_id', 'id');
     }
+
+    public function GetType()
+    {
+        return self::Types[$this->type];
+    }    
 }

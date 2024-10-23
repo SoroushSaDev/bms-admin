@@ -32,8 +32,22 @@
 <!-- Samples -->
 <script>
     // new Toast({
-        //     message: 'This is a danger message. You can use this for errors etc',
-        //     type: 'danger'
+    //     message: 'This is an example with custom buttons',
+    //     type: 'success',
+    //     customButtons: [
+    //         {
+    //             text: 'Refresh the page',
+    //             onClick: function() {
+    //                 window.location.reload();
+    //             }
+    //         },
+    //         {
+    //             text: 'Follow @ireaderinokun',
+    //             onClick: function() {
+    //                 window.open('https://twitter.com/ireaderinokun');
+    //             }
+    //         }
+    //     ]
     // });
 
     // window.swal.fire({
