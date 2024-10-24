@@ -31,7 +31,7 @@ class DeviceRequest extends FormRequest
             'type' => 'nullable',
             'brand' => 'nullable',
             'model' => 'nullable',
-            'topic' => 'nullable',
+            'topic' => 'required',
             'description' => 'nullable',
         ];
     }

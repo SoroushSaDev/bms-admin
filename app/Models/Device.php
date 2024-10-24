@@ -36,6 +36,11 @@ class Device extends Model
         return $this->hasMany(Register::class, 'device_id', 'id');
     }
 
+    public function Patterns()
+    {
+        return $this->hasMany(Pattern::class, 'device_id', 'id');
+    }
+
     public function Children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id', 'id');

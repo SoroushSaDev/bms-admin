@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DeviceRequest;
 use App\Models\Device;
-use Illuminate\Http\JsonResponse;
+use App\Models\Pattern;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 
 class DeviceController extends Controller
 {
@@ -28,7 +27,8 @@ class DeviceController extends Controller
 
     public function create()
     {
-        return view('devices.create');
+        $types = Pattern::Types;
+        return view('devices.create', compact('types'));
     }
 
     public function store(DeviceRequest $request)
@@ -45,7 +45,20 @@ class DeviceController extends Controller
             $device->wifi = $request->has('wifi') ? $request['wifi'] : null;
             $device->mqtt_topic = $request->has('topic') ? $request['topic'] : 'METARIOM/' . str_replace(' ', '_', $device->name);
             $device->save();
-            $device->SendToClient();
+            if($request->has('separator')) {
+                foreach($request['separator'] as $i => $separator) {
+                    Pattern::create([
+                        'user_id' => auth()->id(),
+                        'device_id' => $device->id,
+                        'setter' => $request['setter'][$i],
+                        'beginner' => $request['beginner'][$i],
+                        'finisher' => $request['finisher'][$i],
+                        'separator' => $separator,
+                        'connector' => $request['connector'][$i],
+                        'lenght' => $request['lenght'][$i],
+                    ]);
+                }
+            }
             DB::commit();
             return redirect(route('devices.index'));
         } catch (\Exception $exception) {
